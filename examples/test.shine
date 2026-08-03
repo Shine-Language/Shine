@@ -1,0 +1,18 @@
+fn int identity(x: int) {
+    // Return the input unchanged so we can verify parameter passing.
+    r/x;
+}
+
+fn int pick_second(a: int, b: int) {
+    // Ignore the first argument and return the second one.
+    r/b;
+}
+
+fn int main() {
+    // Exercise the write builtin, which lowers to puts.
+    write("Shine v0.1.0");
+    write("compiled and linked successfully");
+
+    // Call another function with a nested call and return its result.
+    r/pick_second(identity(1), 2);
+}

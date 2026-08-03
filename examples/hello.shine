@@ -1,0 +1,5 @@
+fn int main() {
+    write("Hello, World!");
+    terminal.pause(user_action);
+    r/0;
+}
