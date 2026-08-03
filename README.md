@@ -54,6 +54,10 @@ cmake --build build
 ./hello.exe
 ```
 
+**NOTE:**
+
+You must be in MSYS2 MINGW64 for this to work, every command must be ran from there and no where else.
+
 ---
 
 ## Layout
