@@ -12,7 +12,10 @@ fn int main() {
     // Exercise the write builtin, which lowers to puts.
     write("Shine v0.1.0");
     write("compiled and linked successfully");
-
+	
+	// Pauses the terminal until you explicitely perform a user action.
+	terminal.pause(user_action);
+	
     // Call another function with a nested call and return its result.
     r/pick_second(identity(1), 2);
 }
