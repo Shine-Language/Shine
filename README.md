@@ -4,7 +4,7 @@ A small compiled language with its own lexer, parser, and codegen, targeting LLV
 
 Shine compiles down to native object files and links straight to an executable. No interpreter, no VM, no runtime.
 
-Status: v0.1.0 (unpublished) - compiles functions with parameters, calls, and string/int literals.
+Status: v0.1.0 (Published) - compiles functions with parameters, calls, and string/int literals.
 
 ---
 
