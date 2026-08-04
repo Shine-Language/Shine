@@ -1,5 +1,9 @@
 # Shine
 
+<img width="512" height="512" alt="logo" src="https://github.com/user-attachments/assets/4f123d95-977b-4b3d-b247-31ae4178d8af" />
+
+---
+
 A small compiled language with its own lexer, parser, and codegen, targeting LLVM IR.
 
 Shine compiles down to native object files and links straight to an executable. No interpreter, no VM, no runtime.
