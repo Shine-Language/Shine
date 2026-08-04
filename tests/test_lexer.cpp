@@ -40,6 +40,23 @@ TEST(arrow_token) {
     ASSERT_TRUE(l.tokenize()[0].kind == TokenKind::Arrow);
 }
 
+TEST(v0_2_tokens) {
+    Lexer l("let var + - * / == != < <= > >=", "t.shine");
+    auto toks = l.tokenize();
+    ASSERT_TRUE(toks[0].kind == TokenKind::KwLet);
+    ASSERT_TRUE(toks[1].kind == TokenKind::KwVar);
+    ASSERT_TRUE(toks[2].kind == TokenKind::Plus);
+    ASSERT_TRUE(toks[3].kind == TokenKind::Minus);
+    ASSERT_TRUE(toks[4].kind == TokenKind::Star);
+    ASSERT_TRUE(toks[5].kind == TokenKind::Slash);
+    ASSERT_TRUE(toks[6].kind == TokenKind::EqualEqual);
+    ASSERT_TRUE(toks[7].kind == TokenKind::BangEqual);
+    ASSERT_TRUE(toks[8].kind == TokenKind::Less);
+    ASSERT_TRUE(toks[9].kind == TokenKind::LessEqual);
+    ASSERT_TRUE(toks[10].kind == TokenKind::Greater);
+    ASSERT_TRUE(toks[11].kind == TokenKind::GreaterEqual);
+}
+
 TEST(r_slash_is_return_keyword) {
     Lexer l("r/0;", "t.shine");
     auto toks = l.tokenize();

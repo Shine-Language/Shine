@@ -23,7 +23,13 @@ private:
     TypeRef type();
     StmtPtr stmt();
     StmtPtr returnStmt();
+    StmtPtr varDecl();
+    StmtPtr assignStmt();
     ExprPtr expr();
+    ExprPtr equality();
+    ExprPtr comparison();
+    ExprPtr term();
+    ExprPtr factor();
     ExprPtr primary();
 
     [[noreturn]] void err(const Token& t, const std::string& msg) const;

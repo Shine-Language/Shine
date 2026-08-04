@@ -15,12 +15,20 @@ struct IntLiteralExpr : Expr { int64_t value = 0; };
 struct StringLiteralExpr : Expr { std::string value; };
 struct IdentifierExpr : Expr { std::string name; };
 struct CallExpr : Expr { std::string callee; std::vector<ExprPtr> args; };
+struct BinaryExpr : Expr { std::string op; ExprPtr left; ExprPtr right; };
 
 struct Stmt { virtual ~Stmt() = default; SourceLoc loc; };
 using StmtPtr = std::unique_ptr<Stmt>;
 
 struct ReturnStmt : Stmt { ExprPtr value; };
 struct ExprStmt : Stmt { ExprPtr expr; };
+struct VarDeclStmt : Stmt {
+    bool isMutable = false;
+    std::string name;
+    TypeRef type;
+    ExprPtr value;
+};
+struct AssignStmt : Stmt { std::string name; ExprPtr value; };
 
 struct Param { std::string name; TypeRef type; };
 

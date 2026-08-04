@@ -15,6 +15,11 @@ llvm::Type* CodeGen::mapType(const TypeRef& t) {
     throw CompileError(t.loc, "unknown type '" + t.name + "'");
 }
 
+llvm::AllocaInst* CodeGen::createAlloca(llvm::Function* f, llvm::Type* ty, const std::string& name) {
+    llvm::IRBuilder<> tmp(&f->getEntryBlock(), f->getEntryBlock().begin());
+    return tmp.CreateAlloca(ty, nullptr, name);
+}
+
 llvm::Function* CodeGen::putsFn() {
     if (puts_) return puts_;
     auto* ty = llvm::FunctionType::get(llvm::Type::getInt32Ty(*ctx_),
@@ -45,7 +50,9 @@ void CodeGen::defineFn(const FunctionDecl& fn) {
     size_t i = 0;
     for (auto& arg : f->args()) {
         arg.setName(fn.params[i].name);
-        vars_[fn.params[i].name] = &arg;
+        auto* slot = createAlloca(f, arg.getType(), fn.params[i].name);
+        b_->CreateStore(&arg, slot);
+        vars_[fn.params[i].name] = {slot, false};
         i++;
     }
 
@@ -68,6 +75,22 @@ void CodeGen::genStmt(const Stmt& s) {
         else b_->CreateRetVoid();
         return;
     }
+    if (auto* v = dynamic_cast<const VarDeclStmt*>(&s)) {
+        if (vars_.find(v->name) != vars_.end())
+            throw CompileError(v->loc, "variable '" + v->name + "' is already declared");
+        if (v->type.name == "void") throw CompileError(v->type.loc, "variables cannot have type void");
+        auto* slot = createAlloca(b_->GetInsertBlock()->getParent(), mapType(v->type), v->name);
+        b_->CreateStore(genExpr(*v->value), slot);
+        vars_[v->name] = {slot, v->isMutable};
+        return;
+    }
+    if (auto* a = dynamic_cast<const AssignStmt*>(&s)) {
+        auto it = vars_.find(a->name);
+        if (it == vars_.end()) throw CompileError(a->loc, "undeclared identifier '" + a->name + "'");
+        if (!it->second.isMutable) throw CompileError(a->loc, "cannot assign to immutable variable '" + a->name + "'");
+        b_->CreateStore(genExpr(*a->value), it->second.value);
+        return;
+    }
     if (auto* e = dynamic_cast<const ExprStmt*>(&s)) { genExpr(*e->expr); return; }
     throw CompileError(s.loc, "unhandled statement");
 }
@@ -78,6 +101,7 @@ llvm::Value* CodeGen::genExpr(const Expr& e) {
     if (auto* s = dynamic_cast<const StringLiteralExpr*>(&e))
         return b_->CreateGlobalString(s->value, "str");
     if (auto* id = dynamic_cast<const IdentifierExpr*>(&e)) return genIdentifier(*id);
+    if (auto* bin = dynamic_cast<const BinaryExpr*>(&e)) return genBinary(*bin);
     if (auto* c = dynamic_cast<const CallExpr*>(&e)) return genCall(*c);
     throw CompileError(e.loc, "unhandled expression");
 }
@@ -85,7 +109,28 @@ llvm::Value* CodeGen::genExpr(const Expr& e) {
 llvm::Value* CodeGen::genIdentifier(const IdentifierExpr& i) {
     auto it = vars_.find(i.name);
     if (it == vars_.end()) throw CompileError(i.loc, "undeclared identifier '" + i.name + "'");
-    return it->second;
+    return b_->CreateLoad(it->second.value->getAllocatedType(), it->second.value, i.name);
+}
+
+llvm::Value* CodeGen::genBinary(const BinaryExpr& e) {
+    auto* left = genExpr(*e.left);
+    auto* right = genExpr(*e.right);
+
+    if (e.op == "+") return b_->CreateAdd(left, right, "addtmp");
+    if (e.op == "-") return b_->CreateSub(left, right, "subtmp");
+    if (e.op == "*") return b_->CreateMul(left, right, "multmp");
+    if (e.op == "/") return b_->CreateSDiv(left, right, "divtmp");
+
+    llvm::Value* cmp = nullptr;
+    if (e.op == "==") cmp = b_->CreateICmpEQ(left, right, "eqtmp");
+    else if (e.op == "!=") cmp = b_->CreateICmpNE(left, right, "netmp");
+    else if (e.op == "<") cmp = b_->CreateICmpSLT(left, right, "lttmp");
+    else if (e.op == "<=") cmp = b_->CreateICmpSLE(left, right, "letmp");
+    else if (e.op == ">") cmp = b_->CreateICmpSGT(left, right, "gttmp");
+    else if (e.op == ">=") cmp = b_->CreateICmpSGE(left, right, "getmp");
+
+    if (cmp) return b_->CreateIntCast(cmp, llvm::Type::getInt32Ty(*ctx_), false, "booltmp");
+    throw CompileError(e.loc, "unknown binary operator '" + e.op + "'");
 }
 
 llvm::Value* CodeGen::genWrite(const CallExpr& c) {

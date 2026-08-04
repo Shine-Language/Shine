@@ -78,10 +78,39 @@ FunctionDecl Parser::function() {
 
 StmtPtr Parser::stmt() {
     if (check(TokenKind::KwReturn)) return returnStmt();
+    if (check(TokenKind::KwLet) || check(TokenKind::KwVar)) return varDecl();
+    if (check(TokenKind::Identifier) && peek(1).kind == TokenKind::Equal) return assignStmt();
     auto s = std::make_unique<ExprStmt>();
     s->loc = peek().loc;
     s->expr = expr();
     expect(TokenKind::Semicolon, "after expression");
+    return s;
+}
+
+StmtPtr Parser::varDecl() {
+    const Token& kw = advance();
+    auto s = std::make_unique<VarDeclStmt>();
+    s->loc = kw.loc;
+    s->isMutable = kw.kind == TokenKind::KwVar;
+    expect(TokenKind::LParen, "after variable keyword");
+    s->type = type();
+    expect(TokenKind::RParen, "after variable type");
+    const Token& name = expect(TokenKind::Identifier, "as variable name");
+    s->name = name.text;
+    expect(TokenKind::Equal, "after variable name");
+    s->value = expr();
+    expect(TokenKind::Semicolon, "after variable declaration");
+    return s;
+}
+
+StmtPtr Parser::assignStmt() {
+    const Token& name = advance();
+    auto s = std::make_unique<AssignStmt>();
+    s->loc = name.loc;
+    s->name = name.text;
+    expect(TokenKind::Equal, "after variable name");
+    s->value = expr();
+    expect(TokenKind::Semicolon, "after assignment");
     return s;
 }
 
@@ -94,9 +123,60 @@ StmtPtr Parser::returnStmt() {
     return s;
 }
 
-ExprPtr Parser::expr() { return primary(); }
+static ExprPtr binaryExpr(const Token& op, ExprPtr left, ExprPtr right) {
+    auto e = std::make_unique<BinaryExpr>();
+    e->loc = op.loc;
+    e->op = op.text;
+    e->left = std::move(left);
+    e->right = std::move(right);
+    return e;
+}
+
+ExprPtr Parser::expr() { return equality(); }
+
+ExprPtr Parser::equality() {
+    auto left = comparison();
+    while (check(TokenKind::EqualEqual) || check(TokenKind::BangEqual)) {
+        const Token& op = advance();
+        left = binaryExpr(op, std::move(left), comparison());
+    }
+    return left;
+}
+
+ExprPtr Parser::comparison() {
+    auto left = term();
+    while (check(TokenKind::Less) || check(TokenKind::LessEqual) ||
+           check(TokenKind::Greater) || check(TokenKind::GreaterEqual)) {
+        const Token& op = advance();
+        left = binaryExpr(op, std::move(left), term());
+    }
+    return left;
+}
+
+ExprPtr Parser::term() {
+    auto left = factor();
+    while (check(TokenKind::Plus) || check(TokenKind::Minus)) {
+        const Token& op = advance();
+        left = binaryExpr(op, std::move(left), factor());
+    }
+    return left;
+}
+
+ExprPtr Parser::factor() {
+    auto left = primary();
+    while (check(TokenKind::Star) || check(TokenKind::Slash)) {
+        const Token& op = advance();
+        left = binaryExpr(op, std::move(left), primary());
+    }
+    return left;
+}
 
 ExprPtr Parser::primary() {
+    if (match(TokenKind::LParen)) {
+        auto e = expr();
+        expect(TokenKind::RParen, "to close grouped expression");
+        return e;
+    }
     if (check(TokenKind::IntLiteral)) {
         const Token& t = advance();
         auto e = std::make_unique<IntLiteralExpr>();

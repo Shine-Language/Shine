@@ -7,6 +7,7 @@ namespace shine {
 
 static const std::unordered_map<std::string, TokenKind> kKeywords = {
     {"fn", TokenKind::KwFn},
+    {"let", TokenKind::KwLet}, {"var", TokenKind::KwVar},
     {"int", TokenKind::KwInt}, {"void", TokenKind::KwVoid},
 };
 
@@ -17,6 +18,8 @@ const char* tokenName(TokenKind k) {
         case TokenKind::Identifier: return "identifier";
         case TokenKind::KwFn: return "'fn'";
         case TokenKind::KwReturn: return "'r/'";
+        case TokenKind::KwLet: return "'let'";
+        case TokenKind::KwVar: return "'var'";
         case TokenKind::KwInt: return "'int'";
         case TokenKind::KwVoid: return "'void'";
         case TokenKind::LParen: return "'('";
@@ -28,6 +31,17 @@ const char* tokenName(TokenKind k) {
         case TokenKind::Colon: return "':'";
         case TokenKind::Dot: return "'.'";
         case TokenKind::Arrow: return "'->'";
+        case TokenKind::Equal: return "'='";
+        case TokenKind::Plus: return "'+'";
+        case TokenKind::Minus: return "'-'";
+        case TokenKind::Star: return "'*'";
+        case TokenKind::Slash: return "'/'";
+        case TokenKind::EqualEqual: return "'=='";
+        case TokenKind::BangEqual: return "'!='";
+        case TokenKind::Less: return "'<'";
+        case TokenKind::LessEqual: return "'<='";
+        case TokenKind::Greater: return "'>'";
+        case TokenKind::GreaterEqual: return "'>='";
         case TokenKind::EndOfFile: return "end of file";
         default: return "invalid token";
     }
@@ -137,10 +151,33 @@ std::vector<Token> Lexer::tokenize() {
             case ',': advance(); tok(TokenKind::Comma, ","); break;
             case ':': advance(); tok(TokenKind::Colon, ":"); break;
             case '.': advance(); tok(TokenKind::Dot, "."); break;
+            case '=':
+                advance();
+                if (match('=')) tok(TokenKind::EqualEqual, "==");
+                else tok(TokenKind::Equal, "=");
+                break;
+            case '+': advance(); tok(TokenKind::Plus, "+"); break;
+            case '*': advance(); tok(TokenKind::Star, "*"); break;
+            case '/': advance(); tok(TokenKind::Slash, "/"); break;
+            case '!':
+                advance();
+                if (match('=')) tok(TokenKind::BangEqual, "!=");
+                else err("unexpected '!'");
+                break;
+            case '<':
+                advance();
+                if (match('=')) tok(TokenKind::LessEqual, "<=");
+                else tok(TokenKind::Less, "<");
+                break;
+            case '>':
+                advance();
+                if (match('=')) tok(TokenKind::GreaterEqual, ">=");
+                else tok(TokenKind::Greater, ">");
+                break;
             case '-':
                 advance();
                 if (match('>')) tok(TokenKind::Arrow, "->");
-                else err("unexpected '-'");
+                else tok(TokenKind::Minus, "-");
                 break;
             default: err(std::string("unexpected character '") + c + "'");
         }

@@ -7,9 +7,10 @@
 - [x] Function parameters, identifier expressions, per-function argument passing
 
 ## v0.2.0 - variables and operators
-- [ ] `let name: type = expr;`
-- [ ] Assignment
-- [ ] `+ - * /`, comparisons
+- [x] `let(type) name = expr;`
+- [x] `var(type) name = expr;`
+- [x] Assignment to `var`
+- [x] `+ - * /`, comparisons
 
 ## v0.3.0 - control flow
 - [ ] if/else, while, for

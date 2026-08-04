@@ -6,8 +6,10 @@ namespace shine {
 
 enum class TokenKind {
     IntLiteral, StringLiteral, Identifier,
-    KwFn, KwReturn, KwInt, KwVoid,
+    KwFn, KwReturn, KwLet, KwVar, KwInt, KwVoid,
     LParen, RParen, LBrace, RBrace, Semicolon, Comma, Colon, Dot, Arrow,
+    Equal, Plus, Minus, Star, Slash,
+    EqualEqual, BangEqual, Less, LessEqual, Greater, GreaterEqual,
     EndOfFile, Invalid,
 };
 

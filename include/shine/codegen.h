@@ -14,15 +14,22 @@ public:
     std::unique_ptr<llvm::Module> generate(const Module& mod);
 
 private:
+    struct VarInfo {
+        llvm::AllocaInst* value = nullptr;
+        bool isMutable = false;
+    };
+
     void declareFn(const FunctionDecl& fn);
     void defineFn(const FunctionDecl& fn);
     void genStmt(const Stmt& s);
     llvm::Value* genExpr(const Expr& e);
     llvm::Value* genIdentifier(const IdentifierExpr& i);
+    llvm::Value* genBinary(const BinaryExpr& e);
     llvm::Value* genCall(const CallExpr& c);
     llvm::Value* genWrite(const CallExpr& c);
     llvm::Value* genTerminalPause(const CallExpr& c);
     llvm::Type* mapType(const TypeRef& t);
+    llvm::AllocaInst* createAlloca(llvm::Function* f, llvm::Type* ty, const std::string& name);
     llvm::Function* putsFn();
     llvm::Function* getcharFn();
 
@@ -30,7 +37,7 @@ private:
     std::unique_ptr<llvm::Module> mod_;
     std::unique_ptr<llvm::IRBuilder<>> b_;
     std::unordered_map<std::string, llvm::Function*> fns_;
-    std::unordered_map<std::string, llvm::Value*> vars_;
+    std::unordered_map<std::string, VarInfo> vars_;
     llvm::Function* puts_ = nullptr;
     llvm::Function* getchar_ = nullptr;
 };

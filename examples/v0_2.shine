@@ -1,0 +1,8 @@
+fn int main() {
+    let(int) base = 10;
+    var(int) total = 4;
+
+    total = total + base * 2;
+
+    r/total >= 24;
+}
