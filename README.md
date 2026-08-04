@@ -1,7 +1,12 @@
-# Shine
+<h1 align="center">Shine</h1>
 
-<img width="512" height="512" alt="logo" src="https://github.com/user-attachments/assets/4f123d95-977b-4b3d-b247-31ae4178d8af" />
+<p align="center">
+  <img width="512" height="512" alt="logo" src="https://github.com/user-attachments/assets/4f123d95-977b-4b3d-b247-31ae4178d8af" />
+</p>
 
+<p align="center">
+  <strong>Low Level Language | Compiles Straight To Native Machine Code</strong>
+</p>
 ---
 
 A small compiled language with its own lexer, parser, and codegen, targeting LLVM IR.
