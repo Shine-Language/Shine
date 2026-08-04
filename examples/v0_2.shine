@@ -1,8 +1,18 @@
 fn int main() {
+    // let creates an immutable value.
     let(int) base = 10;
+
+    // var creates a value that can be changed later.
     var(int) total = 4;
 
+    // Operators work inside expressions, with * before +.
     total = total + base * 2;
 
+    write("Shine v0.2.0 example");
+    write("let, var, assignment, operators, and comparisons worked");
+
+    terminal.pause(user_action);
+
+    // Comparisons return 0 or 1 for now.
     r/total >= 24;
 }
