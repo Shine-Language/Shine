@@ -16,11 +16,11 @@
 - [ ] if/else, while, for, etc.
     - while / for will be combined to `loop(condition) {}`
 - [ ] break (written as stop) and continue (written as cont) loop controls
-- [ ] Allow `write()` to support non string literals
 
-## v0.4.0 - inputs
+## v0.4.0 - inputs & non string literals
 - [ ] Add user inputs
     - Would be written as `user_input("TEXT")`
+- [ ] Allow `write()` to support non string literals
 
 ## v0.5.0 - real types
 - [ ] Type hierarchy instead of string-named TypeRef
