@@ -18,14 +18,14 @@
 - [ ] break (written as stop) and continue (written as cont) loop controls
 - [ ] Allow `write()` to support non string literals
 
-## v0.4.0 - real types
+## v0.4.0 - inputs
+- [ ] Add user inputs
+    - Would be written as `user_input("TEXT")`
+
+## v0.5.0 - real types
 - [ ] Type hierarchy instead of string-named TypeRef
 - [ ] Pointers, fixed-width ints
 - [ ] Type-checking pass (codegen currently does no validation of its own)
-
-## v0.5.0 - inputs
-- [ ] Add user inputs
-    - Would be written as `user_input("TEXT")`
 
 ## Later
 - [ ] Structs, arrays
