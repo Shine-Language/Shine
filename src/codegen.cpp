@@ -56,7 +56,7 @@ void CodeGen::defineFn(const FunctionDecl& fn) {
         i++;
     }
 
-    for (auto& s : fn.body) genStmt(*s);
+    genStmtList(fn.body);
 
     if (!b_->GetInsertBlock()->getTerminator()) {
         if (f->getReturnType()->isVoidTy()) b_->CreateRetVoid();
@@ -92,7 +92,73 @@ void CodeGen::genStmt(const Stmt& s) {
         return;
     }
     if (auto* e = dynamic_cast<const ExprStmt*>(&s)) { genExpr(*e->expr); return; }
+    if (auto* i = dynamic_cast<const IfStmt*>(&s)) { genIf(*i); return; }
+    if (auto* l = dynamic_cast<const LoopStmt*>(&s)) { genLoop(*l); return; }
+    if (auto* br = dynamic_cast<const BreakStmt*>(&s)) { genBreak(*br); return; }
+    if (auto* co = dynamic_cast<const ContinueStmt*>(&s)) { genContinue(*co); return; }
     throw CompileError(s.loc, "unhandled statement");
+}
+
+void CodeGen::genStmtList(const std::vector<StmtPtr>& stmts) {
+    for (auto& st : stmts) {
+        if (b_->GetInsertBlock()->getTerminator()) break;
+        genStmt(*st);
+    }
+}
+
+llvm::Value* CodeGen::toBool(llvm::Value* v) {
+    return b_->CreateICmpNE(v, llvm::Constant::getNullValue(v->getType()), "cond");
+}
+
+void CodeGen::genIf(const IfStmt& s) {
+    llvm::Function* f = b_->GetInsertBlock()->getParent();
+    llvm::Value* cond = toBool(genExpr(*s.cond));
+
+    auto* thenBB = llvm::BasicBlock::Create(*ctx_, "then", f);
+    auto* elseBB = llvm::BasicBlock::Create(*ctx_, "else", f);
+    auto* mergeBB = llvm::BasicBlock::Create(*ctx_, "ifcont", f);
+    b_->CreateCondBr(cond, thenBB, elseBB);
+
+    b_->SetInsertPoint(thenBB);
+    genStmtList(s.thenBody);
+    if (!b_->GetInsertBlock()->getTerminator()) b_->CreateBr(mergeBB);
+
+    b_->SetInsertPoint(elseBB);
+    genStmtList(s.elseBody);
+    if (!b_->GetInsertBlock()->getTerminator()) b_->CreateBr(mergeBB);
+
+    b_->SetInsertPoint(mergeBB);
+}
+
+void CodeGen::genLoop(const LoopStmt& s) {
+    llvm::Function* f = b_->GetInsertBlock()->getParent();
+    auto* condBB = llvm::BasicBlock::Create(*ctx_, "loopcond", f);
+    auto* bodyBB = llvm::BasicBlock::Create(*ctx_, "loopbody", f);
+    auto* afterBB = llvm::BasicBlock::Create(*ctx_, "loopend", f);
+
+    b_->CreateBr(condBB);
+
+    b_->SetInsertPoint(condBB);
+    llvm::Value* cond = toBool(genExpr(*s.cond));
+    b_->CreateCondBr(cond, bodyBB, afterBB);
+
+    loopStack_.push_back({condBB, afterBB});
+    b_->SetInsertPoint(bodyBB);
+    genStmtList(s.body);
+    if (!b_->GetInsertBlock()->getTerminator()) b_->CreateBr(condBB);
+    loopStack_.pop_back();
+
+    b_->SetInsertPoint(afterBB);
+}
+
+void CodeGen::genBreak(const BreakStmt& s) {
+    if (loopStack_.empty()) throw CompileError(s.loc, "'stop' used outside of a loop");
+    b_->CreateBr(loopStack_.back().breakBB);
+}
+
+void CodeGen::genContinue(const ContinueStmt& s) {
+    if (loopStack_.empty()) throw CompileError(s.loc, "'cont' used outside of a loop");
+    b_->CreateBr(loopStack_.back().continueBB);
 }
 
 llvm::Value* CodeGen::genExpr(const Expr& e) {

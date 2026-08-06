@@ -9,6 +9,8 @@ static const std::unordered_map<std::string, TokenKind> kKeywords = {
     {"fn", TokenKind::KwFn},
     {"let", TokenKind::KwLet}, {"var", TokenKind::KwVar},
     {"int", TokenKind::KwInt}, {"void", TokenKind::KwVoid},
+    {"if", TokenKind::KwIf}, {"else", TokenKind::KwElse},
+    {"loop", TokenKind::KwLoop}, {"stop", TokenKind::KwStop}, {"cont", TokenKind::KwCont},
 };
 
 const char* tokenName(TokenKind k) {
@@ -22,6 +24,11 @@ const char* tokenName(TokenKind k) {
         case TokenKind::KwVar: return "'var'";
         case TokenKind::KwInt: return "'int'";
         case TokenKind::KwVoid: return "'void'";
+        case TokenKind::KwIf: return "'if'";
+        case TokenKind::KwElse: return "'else'";
+        case TokenKind::KwLoop: return "'loop'";
+        case TokenKind::KwStop: return "'stop'";
+        case TokenKind::KwCont: return "'cont'";
         case TokenKind::LParen: return "'('";
         case TokenKind::RParen: return "')'";
         case TokenKind::LBrace: return "'{'";

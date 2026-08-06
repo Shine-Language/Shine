@@ -79,11 +79,71 @@ FunctionDecl Parser::function() {
 StmtPtr Parser::stmt() {
     if (check(TokenKind::KwReturn)) return returnStmt();
     if (check(TokenKind::KwLet) || check(TokenKind::KwVar)) return varDecl();
+    if (check(TokenKind::KwIf)) return ifStmt();
+    if (check(TokenKind::KwLoop)) return loopStmt();
+    if (check(TokenKind::KwStop)) return breakStmt();
+    if (check(TokenKind::KwCont)) return contStmt();
     if (check(TokenKind::Identifier) && peek(1).kind == TokenKind::Equal) return assignStmt();
     auto s = std::make_unique<ExprStmt>();
     s->loc = peek().loc;
     s->expr = expr();
     expect(TokenKind::Semicolon, "after expression");
+    return s;
+}
+
+std::vector<StmtPtr> Parser::block() {
+    expect(TokenKind::LBrace, "to start block");
+    std::vector<StmtPtr> body;
+    while (!check(TokenKind::RBrace)) {
+        if (atEnd()) err(peek(), "unexpected end of file in block");
+        body.push_back(stmt());
+    }
+    expect(TokenKind::RBrace, "to close block");
+    return body;
+}
+
+StmtPtr Parser::ifStmt() {
+    const Token& kw = advance();
+    auto s = std::make_unique<IfStmt>();
+    s->loc = kw.loc;
+    expect(TokenKind::LParen, "after 'if'");
+    s->cond = expr();
+    expect(TokenKind::RParen, "after if condition");
+    s->thenBody = block();
+    if (match(TokenKind::KwElse)) {
+        if (check(TokenKind::KwIf)) {
+            s->elseBody.push_back(ifStmt());
+        } else {
+            s->elseBody = block();
+        }
+    }
+    return s;
+}
+
+StmtPtr Parser::loopStmt() {
+    const Token& kw = advance();
+    auto s = std::make_unique<LoopStmt>();
+    s->loc = kw.loc;
+    expect(TokenKind::LParen, "after 'loop'");
+    s->cond = expr();
+    expect(TokenKind::RParen, "after loop condition");
+    s->body = block();
+    return s;
+}
+
+StmtPtr Parser::breakStmt() {
+    const Token& kw = advance();
+    auto s = std::make_unique<BreakStmt>();
+    s->loc = kw.loc;
+    expect(TokenKind::Semicolon, "after 'stop'");
+    return s;
+}
+
+StmtPtr Parser::contStmt() {
+    const Token& kw = advance();
+    auto s = std::make_unique<ContinueStmt>();
+    s->loc = kw.loc;
+    expect(TokenKind::Semicolon, "after 'cont'");
     return s;
 }
 
