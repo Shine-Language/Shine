@@ -52,7 +52,17 @@ fn int main() {
 
 ---
 
-## Build (Windows, MSYS2/MinGW)
+## Using The Compiler
+
+To use the compiler you just need to run this command (replace the names with yours):
+
+`shinec yourfile.shine -o output.exe`
+
+After that your Shine code has been compiled and is ready to run!
+
+---
+
+## Building from Source (Windows, MSYS2/MinGW)
 
 ```
 pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
