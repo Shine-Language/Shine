@@ -1,6 +1,6 @@
 # Roadmap
 
-## v0.1.0 - not yet published
+## v0.1.0 - first steps
 - [x] Lexer, parser, codegen for fn/return/call/literals
 - [x] `write` builtin via `puts`
 - [x] Object file emission + link, builds hello.shine
