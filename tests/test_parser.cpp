@@ -93,3 +93,30 @@ TEST(unterminated_block_throws) {
     catch (const CompileError&) { threw = true; }
     ASSERT_TRUE(threw);
 }
+
+TEST(if_else_parses) {
+    Module m = parse("fn int main() { if (1) { r/1; } else { r/0; } }");
+    auto* i = dynamic_cast<IfStmt*>(m.functions[0].body[0].get());
+    ASSERT_TRUE(i != nullptr);
+    ASSERT_EQ(i->thenBody.size(), 1u);
+    ASSERT_EQ(i->elseBody.size(), 1u);
+}
+
+TEST(else_if_chain_nests_as_if) {
+    Module m = parse("fn int main() { if (1) { } else if (2) { } else { } }");
+    auto* i = dynamic_cast<IfStmt*>(m.functions[0].body[0].get());
+    ASSERT_TRUE(i != nullptr);
+    ASSERT_EQ(i->elseBody.size(), 1u);
+    auto* nested = dynamic_cast<IfStmt*>(i->elseBody[0].get());
+    ASSERT_TRUE(nested != nullptr);
+    ASSERT_EQ(nested->elseBody.size(), 0u);
+}
+
+TEST(loop_with_break_and_continue) {
+    Module m = parse("fn int main() { loop (1) { stop; cont; } r/0; }");
+    auto* l = dynamic_cast<LoopStmt*>(m.functions[0].body[0].get());
+    ASSERT_TRUE(l != nullptr);
+    ASSERT_EQ(l->body.size(), 2u);
+    ASSERT_TRUE(dynamic_cast<BreakStmt*>(l->body[0].get()) != nullptr);
+    ASSERT_TRUE(dynamic_cast<ContinueStmt*>(l->body[1].get()) != nullptr);
+}
