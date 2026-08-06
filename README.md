@@ -14,7 +14,7 @@ A small compiled language with its own lexer, parser, and codegen, targeting LLV
 
 Shine compiles down to native object files and links straight to an executable. No interpreter, no VM, no runtime.
 
-Status: v0.1.0 (Published) - compiles functions with parameters, calls, and string/int literals.
+Status: Active Development - compiles functions with parameters, calls, and string/int literals.
 
 ---
 
@@ -28,7 +28,7 @@ Status: v0.1.0 (Published) - compiles functions with parameters, calls, and stri
 
 ---
 
-## Language (v0.1.0)
+## Language Basics
 
 - `fn type name(param: type, ...) { ... }`
 - `int` / `void` types
@@ -36,8 +36,10 @@ Status: v0.1.0 (Published) - compiles functions with parameters, calls, and stri
 - function calls, including passing arguments
 - `r/` (return)
 - `write(string)` - a compiler builtin for now, lowers to `puts`
+- `let` is an immutable variable and `var` is a mutable one
+- Assignment to variables (`var`)
 
-No `let`, no operators, no control flow yet - see `ROADMAP.md`.
+No control flow yet - see `ROADMAP.md`.
 
 ```
 fn int identity(x: int) {
