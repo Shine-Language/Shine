@@ -38,6 +38,7 @@ Status: Active Development - compiles functions with parameters, calls, and stri
 - `write(string)` - a compiler builtin for now, lowers to `puts`
 - `let` is an immutable variable and `var` is a mutable one
 - Assignment to variables (`var`)
+- `+ - * /` and comparisons
 
 No control flow yet - see `ROADMAP.md`.
 
@@ -47,8 +48,11 @@ fn int identity(x: int) {
 }
 
 fn int main() {
+    let(int) base = 10;
+    var(int) total = identity(base);
+    total = total + 5;
     write("Hello, World!");
-    r/identity(0);
+    r/total >= 15;
 }
 ```
 
