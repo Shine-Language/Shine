@@ -13,9 +13,9 @@
 - [x] `+ - * /`, comparisons
 
 ## v0.3.0 - control flow
-- [ ] if/else, while, for, etc.
+- [x] if/else, while, for, etc.
     - while / for will be combined to `loop(condition) {}`
-- [ ] break (written as stop) and continue (written as cont) loop controls
+- [x] break (written as stop) and continue (written as cont) loop controls
 
 ## v0.4.0 - inputs & non string literals
 - [ ] Add user inputs

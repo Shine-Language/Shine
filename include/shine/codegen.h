@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
@@ -19,9 +20,20 @@ private:
         bool isMutable = false;
     };
 
+    struct LoopCtx {
+        llvm::BasicBlock* continueBB = nullptr;
+        llvm::BasicBlock* breakBB = nullptr;
+    };
+
     void declareFn(const FunctionDecl& fn);
     void defineFn(const FunctionDecl& fn);
     void genStmt(const Stmt& s);
+    void genStmtList(const std::vector<StmtPtr>& stmts);
+    void genIf(const IfStmt& s);
+    void genLoop(const LoopStmt& s);
+    void genBreak(const BreakStmt& s);
+    void genContinue(const ContinueStmt& s);
+    llvm::Value* toBool(llvm::Value* v);
     llvm::Value* genExpr(const Expr& e);
     llvm::Value* genIdentifier(const IdentifierExpr& i);
     llvm::Value* genBinary(const BinaryExpr& e);
@@ -38,6 +50,7 @@ private:
     std::unique_ptr<llvm::IRBuilder<>> b_;
     std::unordered_map<std::string, llvm::Function*> fns_;
     std::unordered_map<std::string, VarInfo> vars_;
+    std::vector<LoopCtx> loopStack_;
     llvm::Function* puts_ = nullptr;
     llvm::Function* getchar_ = nullptr;
 };

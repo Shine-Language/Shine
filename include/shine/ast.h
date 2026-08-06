@@ -29,6 +29,14 @@ struct VarDeclStmt : Stmt {
     ExprPtr value;
 };
 struct AssignStmt : Stmt { std::string name; ExprPtr value; };
+struct IfStmt : Stmt {
+    ExprPtr cond;
+    std::vector<StmtPtr> thenBody;
+    std::vector<StmtPtr> elseBody;
+};
+struct LoopStmt : Stmt { ExprPtr cond; std::vector<StmtPtr> body; };
+struct BreakStmt : Stmt {};
+struct ContinueStmt : Stmt {};
 
 struct Param { std::string name; TypeRef type; };
 

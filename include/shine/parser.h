@@ -25,6 +25,11 @@ private:
     StmtPtr returnStmt();
     StmtPtr varDecl();
     StmtPtr assignStmt();
+    StmtPtr ifStmt();
+    StmtPtr loopStmt();
+    StmtPtr breakStmt();
+    StmtPtr contStmt();
+    std::vector<StmtPtr> block();
     ExprPtr expr();
     ExprPtr equality();
     ExprPtr comparison();

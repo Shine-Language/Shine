@@ -1,0 +1,32 @@
+fn int sumTo(n: int) {
+    var(int) total = 0;
+    var(int) i = 0;
+    loop (i <= n) {
+        if (i == 3) {
+            i = i + 1;
+            cont;
+        }
+        total = total + i;
+        i = i + 1;
+    }
+    r/total;
+}
+
+fn int main() {
+    var(int) x = sumTo(10);
+    if (x > 40) {
+        write("big");
+    } else {
+        write("small");
+    }
+
+    var(int) count = 0;
+    loop (1) {
+        count = count + 1;
+        if (count == 5) {
+            stop;
+        }
+    }
+
+    r/count + x;
+}
