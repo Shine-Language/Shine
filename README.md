@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>A Low level language that compiles straight to machine code, no runtime, no VM.</strong>
+  <strong>A low level language that compiles straight to machine code, no runtime, no VM.</strong>
 </p>
 
 ---
